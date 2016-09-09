@@ -1,5 +1,7 @@
 package com.hk.jishunda.test;
 
+import java.util.Calendar;
+
 import org.apache.commons.httpclient.NameValuePair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -66,5 +68,15 @@ public class Junit {
 				new NameValuePair("hidTrainTime","2016-09-01 11:00-12:00"),
 				new NameValuePair("hidOrderMinMinute","60")};
 				System.out.println(data.toString());
+	}
+	
+	
+	
+	
+	@Test
+	public void testCalendar(){
+		Calendar calen = Calendar.getInstance();
+		//calen.set(Calendar.DAY_OF_MONTH, calen.get(Calendar.DAY_OF_MONTH) + 1);
+		System.out.println(calen.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY);
 	}
 }

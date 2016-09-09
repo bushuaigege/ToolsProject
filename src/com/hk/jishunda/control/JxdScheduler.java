@@ -33,10 +33,11 @@ public class JxdScheduler {
 			
 			JobDetail job = JobBuilder.newJob().ofType(RqJsdTask.class)
 					.withIdentity("JxdDayJob", "jxdGroup").build();
-	
+			
+			//现在抢号的人太多提前调度
 			Trigger trigger = TriggerBuilder.newTrigger().withIdentity("jxdDayTrigger", "jxdGroup")
 					.startNow().withSchedule(CronScheduleBuilder
-							.cronSchedule("0 0 9 * * ?")).build();
+							.cronSchedule("0 59 8 * * ?")).build();
 			
 			capture.scheduleJob(job, trigger);
 			

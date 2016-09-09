@@ -83,6 +83,7 @@ public class RqJsdTask implements Job{
 	*/
 	private StringBuffer tmpcookies = new StringBuffer();
 	
+			
 	/** 
 	* @Title: signIn 
 	* @Description:   用户登录
@@ -166,6 +167,7 @@ public class RqJsdTask implements Job{
 			//查询约车时间号源段
 			Calendar calen = Calendar.getInstance();
 			calen.set(Calendar.DAY_OF_MONTH, calen.get(Calendar.DAY_OF_MONTH) + 1);
+			
 			String hidTrainTime = "",hidScheduleId = "",lblTrainDate = CommonUtils.DateFormat("yyyy-MM-dd", calen.getTime());
 			String timePeriodHTML = menthod_request(String.format(queryScheduleList,lblTrainDate),true);
 			log.info("约车时间段~~" + timePeriodHTML);
@@ -175,27 +177,39 @@ public class RqJsdTask implements Job{
 			//转换HTML拾取器
 			Document doc = Jsoup.parse(timePeriodHTML);
 			
-			//获取时间ID
-			Element schedule09 = doc.select("span:contains(09:00)").first();
-			Element schedule10 = doc.select("span:contains(10:00)").first();
-			Element schedule17 = doc.select("span:contains(17:00)").first();
-			Element schedule11 = doc.select("span:contains(11:00)").first();
+			/*Element schedule17 = doc.select("span:contains(17:30-18:30)").first();
+			Element schedule18 = doc.select("span:contains(18:30-19:30)").first();*/
 			
-			//页面表单逻辑可以连续多选时间结果后台服务不允许60min
-			//优先选择(hidScheduleId不需要进行逗号替换,页面代码只是作为判断而非表单提交的参数)
-			if(schedule09 != null){
-				hidTrainTime = lblTrainDate.concat(" ").concat("09:00-10:00");
-				hidScheduleId += schedule09.nextElementSibling().val();
-			}else if(schedule10 != null){
-				hidTrainTime = lblTrainDate.concat(" ").concat("10:00-11:00");
-				hidScheduleId += schedule10.nextElementSibling().val();
+			//判断周六周日
+			int week = calen.get(Calendar.DAY_OF_WEEK) - 1;  
+		    if(week ==6 || week==0){//0代表周日，6代表周六  
+		    	//获取时间ID
+		    	Element schedule16 = doc.select("span:contains(16:30-17:30)").first();
+		    	if(schedule16 != null){
+					hidTrainTime = lblTrainDate.concat(" ").concat("16:30-17:30");
+					hidScheduleId += schedule16.nextElementSibling().val();
+				}
+		    }else{
+		    	Element schedule19 = doc.select("span:contains(19:30-20:30)").first();
+		    	//页面表单逻辑可以连续多选时间结果后台服务不允许60min
+				//优先选择(hidScheduleId不需要进行逗号替换,页面代码只是作为判断而非表单提交的参数)
+				if(schedule19 != null){
+					hidTrainTime = lblTrainDate.concat(" ").concat("19:30-20:30");
+					hidScheduleId = schedule19.nextElementSibling().val();
+				}
+		    }
+			
+		    
+			/*else if(schedule18 != null){
+				hidTrainTime = lblTrainDate.concat(" ").concat("18:30-19:30");
+				hidScheduleId = schedule18.nextElementSibling().val();
 			}else if(schedule17 != null){
-				hidTrainTime = lblTrainDate.concat(" ").concat("17:00-18:00");
-				hidScheduleId = schedule17.nextElementSibling().val();
-			}else if(schedule11 != null){
-				hidTrainTime = lblTrainDate.concat(" ").concat("11:00-12:00");
-				hidScheduleId = schedule11.nextElementSibling().val();
-			}
+				hidTrainTime = lblTrainDate.concat(" ").concat("17:30-18:30");
+				hidScheduleId += schedule17.nextElementSibling().val();
+			}else if(schedule16 != null){
+				hidTrainTime = lblTrainDate.concat(" ").concat("16:30-17:30");
+				hidScheduleId += schedule16.nextElementSibling().val();
+			}*/
 			
 			//没有号源就中断请求
 			/*if(hidScheduleId.isEmpty()){
@@ -268,7 +282,7 @@ public class RqJsdTask implements Job{
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
 		log.info("start jxdTask Capture。。。");
 		signIn();
-		new Reminder(3);
+		new Reminder(1);
 	}
 	
 	@Test
